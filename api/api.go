@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/ghifarij/go-bank/helpers"
+	"github.com/ghifarij/go-bank/transactions"
 	"github.com/ghifarij/go-bank/useraccounts"
 	"github.com/ghifarij/go-bank/users"
 
@@ -91,12 +92,22 @@ func transaction(w http.ResponseWriter, r *http.Request) {
 	apiResponse(transaction, w)
 }
 
+func getMyTransactions(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["userID"]
+	auth := r.Header.Get("Authorization")
+
+	transactions := transactions.GetMyTransactions(userId, auth)
+	apiResponse(transactions, w)
+}
+
 func StartApi() {
 	router := mux.NewRouter()
 	router.Use(helpers.PanicHandler)
 	router.HandleFunc("/login", login).Methods("POST")
 	router.HandleFunc("/register", register).Methods("POST")
 	router.HandleFunc("/transaction", transaction).Methods("POST")
+	router.HandleFunc("/transactions/{userID}", getMyTransactions).Methods("GET")
 	router.HandleFunc("/user/{id}", getUser).Methods("GET")
 	fmt.Println("App is working on Port :8888")
 	log.Fatal(http.ListenAndServe(":8888", router))

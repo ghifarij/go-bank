@@ -17,13 +17,6 @@ type Account struct {
 	UserID  uint
 }
 
-type Transaction struct {
-	gorm.Model
-	From   uint
-	To     uint
-	Amount int
-}
-
 type ResponseAccount struct {
 	ID      uint
 	Name    string
@@ -44,4 +37,18 @@ type Validation struct {
 
 type ErrResponse struct {
 	Message string
+}
+
+type Transaction struct {
+	gorm.Model
+	From   uint
+	To     uint
+	Amount int
+}
+
+type ResponseTransaction struct {
+	ID     uint
+	From   uint
+	To     uint
+	Amount int
 }

@@ -2,10 +2,11 @@ package main
 
 import (
 	"github.com/ghifarij/go-bank/api"
+	"github.com/ghifarij/go-bank/database"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	// migrations.MigrateTransactions()
+	database.InitDatabase()
 	api.StartApi()
 }

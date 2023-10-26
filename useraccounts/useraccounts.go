@@ -3,34 +3,31 @@ package useraccounts
 import (
 	"fmt"
 
+	"github.com/ghifarij/go-bank/database"
 	"github.com/ghifarij/go-bank/helpers"
 	"github.com/ghifarij/go-bank/interfaces"
 	"github.com/ghifarij/go-bank/transactions"
 )
 
 func updateAccount(id uint, amount int) interfaces.ResponseAccount {
-	db := helpers.ConnectDB()
 	account := interfaces.Account{}
 	responseAcc := interfaces.ResponseAccount{}
 
-	db.Where("id = ? ", id).First(&account)
+	database.DB.Where("id = ? ", id).First(&account)
 	account.Balance = uint(amount)
-	db.Save(&account)
+	database.DB.Save(&account)
 
 	responseAcc.ID = account.ID
 	responseAcc.Name = account.Name
 	responseAcc.Balance = int(account.Balance)
-	defer db.Close()
 	return responseAcc
 }
 
 func getAccount(id uint) *interfaces.Account {
-	db := helpers.ConnectDB()
 	account := &interfaces.Account{}
-	if db.Where("id = ? ", id).First(&account).RecordNotFound() {
+	if database.DB.Where("id = ? ", id).First(&account).RecordNotFound() {
 		return nil
 	}
-	defer db.Close()
 	return account
 }
 

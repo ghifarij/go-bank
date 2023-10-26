@@ -3,6 +3,7 @@ package users
 import (
 	"time"
 
+	"github.com/ghifarij/go-bank/database"
 	"github.com/ghifarij/go-bank/helpers"
 	"github.com/ghifarij/go-bank/interfaces"
 	"github.com/golang-jwt/jwt/v5"
@@ -44,11 +45,9 @@ func Login(username string, pass string) map[string]interface{} {
 			{Value: username, Valid: "username"},
 			{Value: pass, Valid: "password"},
 		})
-
 	if valid {
-		db := helpers.ConnectDB()
 		user := &interfaces.User{}
-		if db.Where("username = ? ", username).First(&user).RecordNotFound() {
+		if database.DB.Where("username = ? ", username).First(&user).RecordNotFound() {
 			return map[string]interface{}{"message": "User not found"}
 		}
 
@@ -59,9 +58,7 @@ func Login(username string, pass string) map[string]interface{} {
 		}
 
 		accounts := []interfaces.ResponseAccount{}
-		db.Table("accounts").Select("id, name, balance").Where("user_id = ? ", user.ID).Scan(&accounts)
-
-		defer db.Close()
+		database.DB.Table("accounts").Select("id, name, balance").Where("user_id = ? ", user.ID).Scan(&accounts)
 
 		var response = prepareResponse(user, accounts, true)
 
@@ -78,27 +75,19 @@ func Register(username string, email string, pass string) map[string]interface{}
 			{Value: email, Valid: "email"},
 			{Value: pass, Valid: "password"},
 		})
-
 	if valid {
-		db := helpers.ConnectDB()
 		generatedPassword := helpers.HashAndSalt([]byte(pass))
 		user := &interfaces.User{Username: username, Email: email, Password: generatedPassword}
-		db.Create(&user)
+		database.DB.Create(&user)
 
 		account := &interfaces.Account{Type: "Daily Account", Name: string(username + "'s" + " account"), Balance: 0, UserID: user.ID}
-		db.Create(&account)
-
-		defer db.Close()
+		database.DB.Create(&account)
 
 		accounts := []interfaces.ResponseAccount{}
-		respAccount := interfaces.ResponseAccount{
-			ID:      account.ID,
-			Name:    account.Name,
-			Balance: int(account.Balance),
-		}
+		respAccount := interfaces.ResponseAccount{ID: account.ID, Name: account.Name, Balance: int(account.Balance)}
 		accounts = append(accounts, respAccount)
-
 		var response = prepareResponse(user, accounts, true)
+
 		return response
 	} else {
 		return map[string]interface{}{"message": "not valid values"}
@@ -109,15 +98,12 @@ func GetUser(id string, jwt string) map[string]interface{} {
 	isValid := helpers.ValidateToken(id, jwt)
 
 	if isValid {
-		db := helpers.ConnectDB()
 		user := &interfaces.User{}
-		if db.Where("id = ? ", id).First(&user).RecordNotFound() {
+		if database.DB.Where("id = ? ", id).First(&user).RecordNotFound() {
 			return map[string]interface{}{"message": "User not found"}
 		}
 		accounts := []interfaces.ResponseAccount{}
-		db.Table("accounts").Select("id, name, balance").Where("user_id = ? ", user.ID).Scan(&accounts)
-
-		defer db.Close()
+		database.DB.Table("accounts").Select("id, name, balance").Where("user_id = ? ", user.ID).Scan(&accounts)
 
 		var response = prepareResponse(user, accounts, false)
 		return response
