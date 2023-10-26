@@ -106,11 +106,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHBpcnkiOjE2OTgzM
 ```
 ```bash
 {
-    "data":
-        {"ID":1,
+    "data": {
+        "ID":1,
         "Name":"saiful's account",
-        "Balance":4800000},
-        "message":"all is fine"
+        "Balance":4800000
+    },
+    "message":"all is fine"
 }
 ```
 
