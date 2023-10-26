@@ -1,7 +1,11 @@
 package main
 
-import "github.com/ghifarij/go-bank/migrations"
+import (
+	"github.com/ghifarij/go-bank/api"
+	_ "github.com/lib/pq"
+)
 
 func main() {
-	migrations.Migrate()
+	// migrations.Migrate()
+	api.StartApi()
 }

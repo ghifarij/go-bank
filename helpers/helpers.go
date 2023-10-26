@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -15,4 +16,10 @@ func HashAndSalt(pass []byte) string {
 	HandleErr(err)
 
 	return string(hashed)
+}
+
+func ConnectDB() *gorm.DB {
+	db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=go-bank password=112233 sslmode=disable")
+	HandleErr(err)
+	return db
 }
